@@ -1,7 +1,8 @@
 var name = ""
 name = localStorage.getItem('username');
-var base_url = window.location.origin;
+var base_url = "http://localhost:3000";
 console.log(base_url);
+var history_size = 0;
 function base64encode(str) {
 	return btoa(unescape(encodeURIComponent(str)));
 }
@@ -15,6 +16,8 @@ function set_username() {
 	localStorage.setItem('username', name);
 }
 
+function add_message(msg) {
+}
 function send() {
 	var message = {
 		"sender": name,
@@ -24,30 +27,68 @@ function send() {
 		"chat": chat,
 		"message": message
 	};
-	alert(JSON.stringify(request)); /*
-	const HTTP = new XMLHttpRequest();
-	const url="http://localhost:3000/send"
-	HTTP.open("POST", url);
-	HTTP.setRequestHeader("Content-Type", "application/json");
-	HTTP.send(JSON.stringify(request));
-	HTTP.upload.onprogress = function(e) {
-		console.log(e.loaded);
-		console.log(e.total);
-	}
-	HTTP.upload.onload = function(e) {
-		console.log("Data sent");
-	}
-	HTTP.onload = function() {
-		console.log(HTTP.status);
-	}
-	HTTP.onerror = function() {
-		console.log("Unknown error");
-	} */
+	alert(JSON.stringify(request));
+	fetch(base_url + '/send', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(request)
+	})
+	.then(response => response.json())
+	.then(data => {
+		console.log(data);
+	})
+	.catch(error => {
+		console.error('ERROR:', error);
+	});
 }
 
 function get_message(n) {
-	var request = base_url + "/get?chat=" + chat + "&n=" + n;
+	var params = new URLSearchParams({
+		chat: chat,
+		n: n
+	});
+	fetch(base_url + `/get?${params.toString()}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})
+	.then(response => response.json())
+	.then(data => {
+		add_message(JSON.parse(data));
+		console.log(data);
+	})
+	.catch(error => {
+		console.error('ERROR:', error);
+	});
 
+}
+
+function check() {
+	const params = new URLSearchParams({
+		chat: chat
+	});
+	fetch(base_url + `/check?${params.toString()}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})
+	.then(response => response.json())
+	.then(data => {
+		var current_hist_size = JSON.parse(data).size;
+		if ((history_size) != current_hist_size) {
+			for (var i = history_size; i < current_hist_size; i ++) {
+				get_message(i);
+			}
+		}
+		console.log(data);
+	})
+	.catch(error => {
+		console.error('ERROR:', error);
+	});
 }
 
 function scrollToBottom() {

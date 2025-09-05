@@ -1,10 +1,10 @@
 const http = require('http');
 const url = require('url');
 const express = require('express');
-const fs = require('fs').promises;
+const fs = require('fs');
 
 const app = express();
-app.use(express.JSON());
+app.use(express.json());
 
 //общий класс управления чатом
 class ChatManager {
@@ -13,7 +13,7 @@ class ChatManager {
 	  this.chat = 0;
 	}
 
-	save_history() 
+	async save_history() 
 	{
 		try {
 			await fs.writeFile('history.json', JSON.stringify(this.history));
@@ -37,7 +37,7 @@ class ChatManager {
 	}
 
 	check(chat) {
-		return (chat < 0 || chat >= this.history.length) ? 0 : this.history[chat];
+		return (chat < 0 || chat >= this.history.length) ? 0 : this.history[chat].length;
 	}
 	
 	send(msg) { //0 - неудача, 1 - успех
@@ -53,7 +53,7 @@ class ChatManager {
   }
   
 const chatManager = new ChatManager();
-chatManager.load_history();
+// chatManager.load_history();
 
 app.get('/check', (req, res) => {
   const chat = parseInt(req.query.chat);
@@ -96,8 +96,8 @@ app.use((req, res) => {
   res.status(404).send('Not Found');
 });
 
-server.listen(3000, () => {
-console.log('Server listening on port 3000');
+const server = app.listen(3000, () => {
+  console.log('Server listening on port 3000');
 });
 
 process.on('SIGINT', async () => {
@@ -108,3 +108,4 @@ process.on('SIGINT', async () => {
     process.exit(0);
   });
 });
+
