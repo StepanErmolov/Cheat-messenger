@@ -1,0 +1,199 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  height: 100vh;
+  color: #ffffff;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #181818;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #404040;
+}
+
+a {
+  all: unset;
+  cursor: pointer; 
+}
+
+h2 {
+  text-align: center;
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.login {
+  margin-bottom: 20px;
+  
+}
+
+#username {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  background-color: #3d3d3d;
+  border: 1px solid #555;
+  color: #ffffff;
+  border-radius: 4px;
+}
+
+#nickname::placeholder {
+  color: #999;
+}
+
+.chat-list {
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.chat-list ul {
+  list-style-type: none;
+}
+
+.chat-item {
+  padding: 12px 15px;
+  margin: 5px 0;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  color: #cccccc;
+}
+
+.chat-item:hover {
+  background-color: #3d3d3d;
+}
+
+.chat-item.active {
+  background-color: #212121;
+  color: #ffffff;
+}
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1a1a;
+}
+
+.chat-history {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #1F1F1F;
+}
+
+.message {
+  display: flex;          /* размещаем ник и текст в строку */
+  align-items: flex-start; /* чтобы текст начинался сверху */
+  margin: 5px 0;
+  padding: 12px;
+  border-radius: 2px;
+}
+
+.username {
+  color: #64b5f6;
+  font-weight: bold;
+  font-size: 0.9em;
+  width: 90px;           /* фиксированная ширина колонки для ника */
+  color: #3A9132;
+  flex-shrink: 0;  
+}
+
+.message-content {
+  line-height: 1.4;
+  color: #3A9132;
+}
+
+/* Стили для поддержки highlight.js */
+.message-content pre {
+  background-color: #2d2d2d;
+  border-radius: 6px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid #404040;
+}
+
+.message-content code {
+  background-color: #2d2d2d;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.input-area {
+  padding: 50px;
+  background-color: #181818;
+  border-top: 1px solid #404040;
+  display: flex;
+  gap: 10px;
+}
+
+#message {
+  flex: 1;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #555;
+  background-color: #1e1e1e;
+  color: #ffffff;
+  resize: none; /* Отключаем изменение размера */
+  overflow-y: auto; /* Добавляем вертикальный скроллбар */
+  min-height: 50px; /* Минимальная высота */
+  max-height: 200px; /* Максимальная высота перед появлением скроллбара */
+  line-height: 1.4;
+  font-family: inherit;
+  white-space: pre-wrap; /* Сохраняем переносы строк */
+  word-wrap: break-word; /* Переносим длинные слова */
+}
+
+#message::placeholder {
+  color: #999;
+}
+
+button {
+  padding: 12px 20px;
+  background-color: #1e1e1e;
+  color: rgb(30, 178, 215);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #2e2e2e;
+}
+
+/* Стили для скроллбара */
+.chat-history::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-history::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.chat-history::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}

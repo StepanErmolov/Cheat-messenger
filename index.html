@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheating messenger</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Боковая панель -->
+    <div class="sidebar">
+      <h2>Messenger</h2>
+      <div class="chat-list">
+        <ul>
+          <li class="chat-item">
+            <a href="ai.html"> ai.py </a>
+	  </li>
+          <li class="chat-item active">
+            <a href="index.html"> main.py </a>
+	  </li>
+          <li class="chat-item">
+            <a href="index2.html"> second.py </a>
+	  </li>
+        </ul>
+      </div>
+      <div class="login">
+        <input type="text" id="username" placeholder="Enter username">
+        <button onclick="set_username()">Set username</button>
+      </div>
+   </div>
+
+    <!-- Основная часть чата -->
+    <div class="chat-area">
+      <div class="chat-history" id="chat-history"></div>
+      <div class="input-area">
+        <textarea id="message" placeholder="Enter message ..." onkeydown="checkEnter(event)" rows="1"></textarea>
+        <button onclick="send()">Send</button>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">const chat = 0;</script>
+  <script src="highlight.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
