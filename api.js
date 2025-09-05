@@ -1,144 +1,110 @@
 const http = require('http');
 const url = require('url');
-const fs = require('fs');
+const express = require('express');
+const fs = require('fs').promises;
 
-//общий класс управления чатом, сделал все через методы, чтобы удобнее выглядело
+const app = express();
+app.use(express.JSON());
+
+//общий класс управления чатом
 class ChatManager {
 	constructor() {
 	  this.history = [[], [], []];
 	  this.chat = 0;
 	}
 
-	save_history() {
-		fs.writeFile('history.json', JSON.stringify(this.history), err => {
-			if (err) console.error(err);
-			else console.log('history has been rewritten');
+	save_history() 
+	{
+		try {
+			await fs.writeFile('history.json', JSON.stringify(this.history));
+			console.log('history has been rewritten');
+		}
+		catch (err) {
+			console.error(err);
 		}
 	}
 
-	load_history() {
-		this.history = JSON.parse(fs.readFileSync('history.json'));
+
+	async load_history() 
+	{
+		try {
+			const data = await fs.readFileSync('history.json', 'utf-8');
+			this.history = JSON.parse(data);
+		} 
+		catch (err) {
+			console.error(err);
+		}
 	}
 
 	check(chat) {
 		return (chat < 0 || chat >= this.history.length) ? 0 : this.history[chat];
 	}
 	
-	send(msg) {
-		return (chat < 0 || chat >= this.history.length) ? 0 : this.history[this.chat].push(msg);
+	send(msg) { //0 - неудача, 1 - успех
+		if (this.chat < 0 || this.chat >= this.history.length) return 0;
+		this.history[this.chat].push(msg);
+		return 1;
 	}
 
 	get_msg(chat, n) {
 		return ((chat < 0 || chat >= this.history.length) || (n < 0 || n >= this.history[chat].length)) 
 		? 0 : this.history[chat][n];
 	}
-
-	login(user) {
-	  if (user.length >= 2 && user.length <= 20) {
-		this.make_ai_chat(user);
-	  }
-	}
-  
-	make_ai_chat(user) {
-	}
   }
   
-  const chatManager = new ChatManager();
+const chatManager = new ChatManager();
+chatManager.load_history();
 
-  const server = http.createServer((req, res) => {
-	try {
-	  const parsed = url.parse(req.url, true);
-  
-	  if (req.method === 'GET') {
-		if (parsed.pathname === '/check') {
-		  const chat = parseInt(parsed.query.chat);
-		  const result = chatManager.check(chat);
-		  res.writeHead(200, { 'Content-Type': 'application/json' });
-		  res.end(JSON.stringify(result));
-		} else if (parsed.pathname === '/get') {
-		  const chat = parseInt(parsed.query.chat);
-		  const n = parseInt(parsed.query.n);
-		  const msg = chatManager.get_msg(chat, n);
-		  if (msg === 0) {
-			res.writeHead(400, { 'Content-Type': 'text/plain' });
-			res.end(':(((');
-		  } else {
-			res.writeHead(200, { 'Content-Type': 'application/json' });
-			res.end(JSON.stringify(msg));
-		  }
-		} else {
-		  res.writeHead(404, { 'Content-Type': 'text/plain' });
-		  res.end(':(');
-		}
-	  } else if (req.method === 'POST') {
-		let body = '';
-		req.on('data', chunk => {
-		  body += chunk.toString();
-		});
-  
-		req.on('end', () => {
-		  if (parsed.pathname === '/login') {
-			const user = body.trim();
-			if (chatManager.login(user)) {
-			  res.writeHead(200, { 'Content-Type': 'text/plain' });
-			  res.end('suck ses');
-			} else {
-			  res.writeHead(400, { 'Content-Type': 'text/plain' });
-			  res.end('invalid (who?)');
-			}
-		  } else if (parsed.pathname === '/send') {
-			let data;
-			try {
-			  data = JSON.parse(body);
-			} catch (e) {
-			  res.writeHead(400, { 'Content-Type': 'text/plain' });
-			  res.end('you');
-			  return;
-			}
-  
-			if (!data.msg) {
-			  res.writeHead(400, { 'Content-Type': 'text/plain' });
-			  res.end('No message provided');
-			  return;
-			}
-  
-			const result = chatManager.send(data.msg);
-			if (result === 0) {
-			  res.writeHead(400, { 'Content-Type': 'text/plain' });
-			  res.end('No! God! Please! No!');
-			} else {
-			  res.writeHead(200, { 'Content-Type': 'text/plain' });
-			  res.end('Fuck Yes');
-			}
-		  } else {
-			res.writeHead(404, { 'Content-Type': 'text/plain' });
-			res.end('Not Found');
-		  }
-		});
-	  } else {
-		res.writeHead(405, { 'Content-Type': 'text/plain' });
-		res.end('GO FUCK YOURSELF');
-	  }
-	} catch (err) {
-	  console.error(err);
-	  res.writeHead(500, { 'Content-Type': 'text/plain' });
-	  res.end('Internal Server Error');
-	}
-  });
-  
-  server.listen(3000, () => {
-	console.log('Server listening on port 3000');
-  });
+app.get('/check', (req, res) => {
+  const chat = parseInt(req.query.chat);
+  if (isNaN(chat)) {
+    return res.status(400).send('wrong parameters');
+  }
+  const result = chatManager.check(chat);
+  if (result === 0) {
+    return res.status(404).send('chat not found');
+  }
+  res.json(result);
+});
 
-process.on('SIGINT', function () {
-	server.close(function () {
-		fs.writeFile('history.json', JSON.stringify(history), err => {
-			if (err) {
-				console.error(err);
-			} else {
-				console.log("History saved!");
-			}
-		});
-		console.log('Server closed!');
-	});
+app.get('/get', (req, res) => {
+  const chat = parseInt(req.query.chat);
+  const n = parseInt(req.query.n);
+  if (isNaN(chat) || isNaN(n)) {
+    return res.status(400).send('wrong parameters');
+  }
+  const msg = chatManager.get_msg(chat, n);
+  if (msg === 0) {
+    return res.status(404).send('message not found');
+  }
+  res.json(msg);
+});
+
+app.post('/send', (req, res) => {
+  const data = req.body;
+  if (!data || typeof data.msg !== 'string') {
+    return res.status(400).send('no message');
+  }
+  const result = chatManager.send(data.msg);
+  if (result === 0) {
+    return res.status(400).send('fail');
+  }
+  res.send('message send');
+});
+
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
+
+server.listen(3000, () => {
+console.log('Server listening on port 3000');
+});
+
+process.on('SIGINT', async () => {
+  console.log('\nSaving history');
+  await chatManager.save_history();
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });
