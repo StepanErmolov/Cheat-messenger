@@ -8,11 +8,22 @@ class ChatManager {
 	  this.history = [[], [], []];
 	  this.chat = 0;
 	}
-  
+
+	save_history() {
+		fs.writeFile('history.json', JSON.stringify(this.history), err => {
+			if (err) console.error(err);
+			else console.log('history has been rewritten');
+		}
+	}
+
+	load_history() {
+		this.history = JSON.parse(fs.readFileSync('history.json'));
+	}
+
 	check(chat) {
 		return (chat < 0 || chat >= this.history.length) ? 0 : this.history[chat];
 	}
-
+	
 	send(msg) {
 		return (chat < 0 || chat >= this.history.length) ? 0 : this.history[this.chat].push(msg);
 	}
