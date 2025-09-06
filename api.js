@@ -56,7 +56,6 @@ const chatManager = new ChatManager();
 chatManager.load_history();
 
 app.get('/check', (req, res) => {
-    console.log('GET /check вызван');
   const chat = parseInt(req.query.chat);
   if (isNaN(chat)) {
     return res.status(400).send('wrong parameters');
@@ -82,21 +81,19 @@ app.get('/get', (req, res) => {
 });
 
 app.post('/send', (req, res) => {
-  console.log('POST /send вызван: ', req.body);
   const data = req.body;
-  if (!data || typeof data.msg !== 'string' || typeof data.chat !== 'number') {
-    return res.status(400).send('no message or god bless america');
+  if (!data || !data.chat || !data.message || data.message.trim() === '') {
+    return res.type('text/plain').status(400).send('no message or god bless america');
   }
-  const result = chatManager.send(data.chat, data.msg);
+  const result = chatManager.send(data.chat, data.message);
   if (result === 0) {
-    return res.status(400).send('fail');
+    return res.type('text/plain').status(400).send('fail');
   }
-  res.send('message send');
+  res.type('text/plain').send('message send');
 });
 
-
 app.use((req, res) => {
-  res.status(404).send('unluck');
+  res.type('text/plain').status(404).send('not found');
 });
 
 const server = app.listen(3000, () => {
