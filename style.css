@@ -109,7 +109,7 @@ h2 {
 .username {
   color: #64b5f6;
   font-weight: bold;
-  font-size: 0.9em;
+  font-size: 1em;
   width: 90px;           /* фиксированная ширина колонки для ника */
   color: #3A9132;
   flex-shrink: 0;  
@@ -117,23 +117,12 @@ h2 {
 
 .message-content {
   line-height: 1.4;
-  color: #3A9132;
-}
-
-/* Стили для поддержки highlight.js */
-.message-content pre {
-  background-color: #2d2d2d;
-  border-radius: 6px;
-  padding: 12px;
+  color: #ffffff;
+  width: max-width;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   overflow-x: auto;
-  margin: 8px 0;
-  border: 1px solid #404040;
-}
-
-.message-content code {
-  background-color: #2d2d2d;
-  padding: 2px 6px;
-  border-radius: 4px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 

@@ -1,6 +1,6 @@
 var name = ""
 name = localStorage.getItem('username');
-var base_url = "http://localhost:3000";
+var base_url = "http://your-url-here"
 console.log(base_url);
 var history_size = 0;
 function base64encode(str) {
@@ -12,23 +12,31 @@ function base64decode(str) {
 
 function set_username() {
 	var user_name = document.getElementById("username").value;
+	document.getElementById("username").value = '';
 	name = base64encode(user_name);
 	localStorage.setItem('username', name);
 }
 
 function add_message(msg) {
+	var text = `<div class="message">
+          <div class="username">${base64decode(msg.sender)}</div>
+          <pre class="message-content">${hljs.highlightAuto(base64decode(msg.text)).value}</pre>
+        </div>`;
+	console.log(hljs.highlightAuto(base64decode(msg.text)).value)
+	document.getElementById('chat-history').innerHTML += text;
 }
 function send() {
 	var message = {
 		"sender": name,
 		"text": base64encode(document.getElementById("message").value),
 	};
+	document.getElementById("message").value = '';
 	var request = {
 		"chat": chat,
 		"message": message
 	};
-	alert(JSON.stringify(request));
-	fetch(base_url + '/send', {
+	add_message(message);
+	fetch(base_url + '/api/send', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -49,7 +57,7 @@ function get_message(n) {
 		chat: chat,
 		n: n
 	});
-	fetch(base_url + `/get?${params.toString()}`, {
+	fetch(base_url + `/api/get?${params.toString()}`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
@@ -70,7 +78,7 @@ function check() {
 	const params = new URLSearchParams({
 		chat: chat
 	});
-	fetch(base_url + `/check?${params.toString()}`, {
+	fetch(base_url + `/api/check?${params.toString()}`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json'
