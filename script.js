@@ -105,3 +105,9 @@ function scrollToBottom() {
 }
 
 const intervalId = setInterval(check, 1000);
+
+document.addEventListener('keydown', function(event) {
+	if (event.ctrlKey && event.key === 'Enter') {
+		send();
+	}
+});
