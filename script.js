@@ -35,7 +35,6 @@ function send() {
 		"chat": chat,
 		"message": message
 	};
-	add_message(message);
 	fetch(base_url + '/api/send', {
 		method: 'POST',
 		headers: {
@@ -65,7 +64,7 @@ function get_message(n) {
 	})
 	.then(response => response.json())
 	.then(data => {
-		add_message(JSON.parse(data));
+		add_message(data);
 		console.log(data);
 	})
 	.catch(error => {
@@ -86,12 +85,13 @@ function check() {
 	})
 	.then(response => response.json())
 	.then(data => {
-		var current_hist_size = JSON.parse(data).size;
+		var current_hist_size = data;
 		if ((history_size) != current_hist_size) {
 			for (var i = history_size; i < current_hist_size; i ++) {
 				get_message(i);
 			}
 		}
+		history_size = current_hist_size;
 		console.log(data);
 	})
 	.catch(error => {
@@ -103,3 +103,5 @@ function scrollToBottom() {
 	const chatHistory = document.getElementById('chat-history');
 	chatHistory.scrollTop = chatHistory.scrollHeight;
 }
+
+const intervalId = setInterval(check, 1000);
