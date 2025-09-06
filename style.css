@@ -98,6 +98,11 @@ h2 {
   background-color: #1F1F1F;
 }
 
+.message-counter {
+  color: gray;
+  margin-right: 2px;
+}
+
 .message {
   display: flex;          /* размещаем ник и текст в строку */
   align-items: flex-start; /* чтобы текст начинался сверху */
