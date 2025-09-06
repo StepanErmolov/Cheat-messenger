@@ -1,61 +1,62 @@
 const http = require('http');
 const url = require('url');
-const express = require('express');
 const fs = require('fs');
+const express = require('express');
 
 const app = express();
 app.use(express.json());
 
 //общий класс управления чатом
 class ChatManager {
-	constructor() {
-	  this.history = [[], [], []];
-	  this.chat = 0;
-	}
+    constructor() {
+        this.history = [[], [], []];
+        this.chat = 0;
+    }
 
-	async save_history() 
-	{
-		try {
-			await fs.writeFile('history.json', JSON.stringify(this.history));
-			console.log('history has been rewritten');
-		}
-		catch (err) {
-			console.error(err);
-		}
-	}
+    save_history() {
+        try {
+            fs.writeFileSync('history.json', JSON.stringify(this.history, null, 2), 'utf8');
+            console.log('history saved');
+        } catch (err) {
+            console.error('error saving history: ', err);
+        }
+    }
 
+    load_history() {
+        try {
+            const data = fs.readFileSync('history.json', 'utf8');
+            this.history = JSON.parse(data);
+            console.log('history loaded: ', this.history);
+        } catch (err) {
+            if (err.code === 'ENOENT') {
+                console.warn('history not found');
+            } else {
+                console.error('error loading history: ', err);
+            }
+        }
+    }
 
-	async load_history() 
-	{
-		try {
-			const data = await fs.readFileSync('history.json', 'utf-8');
-			this.history = JSON.parse(data);
-		} 
-		catch (err) {
-			console.error(err);
-		}
-	}
+    check(chat) {
+    return (chat >= 0 && chat < this.history.length) ? this.history[chat].length : 0;
+    }
 
-	check(chat) {
-		return (chat < 0 || chat >= this.history.length) ? 0 : this.history[chat].length;
-	}
-	
-	send(msg) { //0 - неудача, 1 - успех
-		if (this.chat < 0 || this.chat >= this.history.length) return 0;
-		this.history[this.chat].push(msg);
-		return 1;
-	}
+    send(chat, msg) {
+        return (chat >= 0 && chat < this.history.length) ? (this.history[chat].push(msg), 1) : 0;
+    }
 
-	get_msg(chat, n) {
-		return ((chat < 0 || chat >= this.history.length) || (n < 0 || n >= this.history[chat].length)) 
-		? 0 : this.history[chat][n];
-	}
-  }
+    get_msg(chat, n) {
+        return (chat >= 0 && chat < this.history.length && n >= 0 && n < this.history[chat].length)
+            ? this.history[chat][n]
+            : 0;
+    }
+
+}
   
 const chatManager = new ChatManager();
-// chatManager.load_history();
+chatManager.load_history();
 
 app.get('/check', (req, res) => {
+    console.log('GET /check вызван');
   const chat = parseInt(req.query.chat);
   if (isNaN(chat)) {
     return res.status(400).send('wrong parameters');
@@ -81,19 +82,21 @@ app.get('/get', (req, res) => {
 });
 
 app.post('/send', (req, res) => {
+  console.log('POST /send вызван: ', req.body);
   const data = req.body;
-  if (!data || typeof data.msg !== 'string') {
-    return res.status(400).send('no message');
+  if (!data || typeof data.msg !== 'string' || typeof data.chat !== 'number') {
+    return res.status(400).send('no message or god bless america');
   }
-  const result = chatManager.send(data.msg);
+  const result = chatManager.send(data.chat, data.msg);
   if (result === 0) {
     return res.status(400).send('fail');
   }
   res.send('message send');
 });
 
+
 app.use((req, res) => {
-  res.status(404).send('Not Found');
+  res.status(404).send('unluck');
 });
 
 const server = app.listen(3000, () => {
