@@ -17,8 +17,9 @@ function set_username() {
 	localStorage.setItem('username', name);
 }
 
-function add_message(msg) {
+function add_message(msg, n) {
 	var text = `<div class="message">
+		  <div class="message-counter">${n + 1}.</div>
           <div class="username">${base64decode(msg.sender)}</div>
           <pre class="message-content">${hljs.highlightAuto(base64decode(msg.text)).value}</pre>
         </div>`;
@@ -62,7 +63,7 @@ function get_message(n) {
 	xhr.send()
 
 	if(xhr.status === 200) {
-		add_message(JSON.parse(xhr.responseText));
+		add_message(JSON.parse(xhr.responseText), n);
 		console.log(xhr.responseText);
 	} else { console.error("Cataclism happend"); }
 }
