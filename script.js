@@ -57,21 +57,14 @@ function get_message(n) {
 		chat: chat,
 		n: n
 	});
-	fetch(base_url + `/api/get?${params.toString()}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	})
-	.then(response => response.json())
-	.then(data => {
-		add_message(data);
-		console.log(data);
-	})
-	.catch(error => {
-		console.error('ERROR:', error);
-	});
+	const xhr = new XMLHttpRequest();
+	xhr.open('GET', base_url + `/api/get?${params.toString()}`, false);
+	xhr.send()
 
+	if(xhr.status === 200) {
+		add_message(JSON.parse(xhr.responseText));
+		console.log(xhr.responseText);
+	} else { console.error("Cataclism happend"); }
 }
 
 function check() {
