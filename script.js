@@ -26,6 +26,7 @@ function add_message(msg) {
 	document.getElementById('chat-history').innerHTML += text;
 }
 function send() {
+	if (document.getElementById("message").value.trim() === '') return;
 	var message = {
 		"sender": name,
 		"text": base64encode(document.getElementById("message").value),

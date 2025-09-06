@@ -82,7 +82,7 @@ app.get('/get', (req, res) => {
 
 app.post('/send', (req, res) => {
   const data = req.body;
-  if (!data || !data.chat || !data.message || data.message.trim() === '') {
+  if (!data || data.message.text.trim() === '') {
     return res.type('text/plain').status(400).send('no message or god bless america');
   }
   const result = chatManager.send(data.chat, data.message);
